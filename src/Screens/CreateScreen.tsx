@@ -14,6 +14,7 @@ import {
   Colors,
   Title,
   Subheading,
+  useTheme,
 } from 'react-native-paper';
 import NetInfo from '@react-native-community/netinfo';
 import asyncStorage from '../services/asyncStorage';
@@ -25,6 +26,9 @@ const PButton: any = Button;
 const styles = StyleSheet.create({
   con: {
     padding: 8 * 2,
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
   },
   textInput: {
     marginBottom: 8,
@@ -33,6 +37,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    flexGrow: 1,
   },
 
   device: {
@@ -56,9 +61,15 @@ const styles = StyleSheet.create({
     right: 80,
     zIndex: 100,
   },
+  btn: {
+    position: 'absolute',
+    bottom: 0,
+  },
 });
-const CreateScreen = ({navigation, route}: CreateScreenProp) => {
-  const id = route.params && route.params.id;
+const CreateScreen = ({navigation}: any) => {
+  const {colors} = useTheme();
+  const id =
+    navigation.state && navigation.state.params && navigation.state.params.id;
   const dispatch = useDispatch();
   const [data, setData] = useState(null as ITransport | null);
   const [devices, setDevices] = useState([] as IDevice[]);
@@ -137,7 +148,9 @@ const CreateScreen = ({navigation, route}: CreateScreenProp) => {
     }
   }, [id]);
 
-  if (!data) return null;
+  if (!data) {
+    return <View />;
+  }
   return (
     <View style={styles.con}>
       <ScrollView>
@@ -221,7 +234,14 @@ const CreateScreen = ({navigation, route}: CreateScreenProp) => {
               </View>
             );
           })}
-          {!id && <IconButton icon="plus" size={28} onPress={onAddDevice} />}
+          {!id && (
+            <IconButton
+              icon="plus"
+              size={28}
+              color={colors.accent}
+              onPress={onAddDevice}
+            />
+          )}
         </View>
         <PButton mode="contained" onPress={handleSubmit(onSubmit)}>
           Вiдправити

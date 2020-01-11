@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, View, StyleSheet, ActivityIndicator} from 'react-native';
-import {IconButton, List, Searchbar, Title} from 'react-native-paper';
+import {IconButton, List, Searchbar, Title, useTheme} from 'react-native-paper';
 import {ListScreenProp} from '../typings/NavigatorTypes';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useDispatch, useSelector} from 'react-redux';
@@ -34,6 +34,7 @@ const NoInternet = () => {
 };
 
 const ListScreen = ({navigation}: ListScreenProp) => {
+  const {colors} = useTheme();
   const {data: items, isLoading} = useSelector(getTransportData);
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
@@ -59,14 +60,15 @@ const ListScreen = ({navigation}: ListScreenProp) => {
   return (
     <View style={styles.con}>
       <Searchbar
+        iconColor={colors.primary}
         placeholder="Пошук"
         onChangeText={query => setSearch(query)}
         value={search}
       />
       {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" style={{flexGrow: 1}} />
+        <ActivityIndicator size="large" color={colors.accent} />
       ) : (
-        <NoInternet />
+        items.length === 0 && <NoInternet />
       )}
       <ScrollView style={{flexGrow: 1}}>
         {filterData.length > 0 &&
@@ -81,14 +83,15 @@ const ListScreen = ({navigation}: ListScreenProp) => {
                 onPress={() => handlePress(item.id)}
                 title={item.number_transport}
                 description={desc}
-                left={() => <List.Icon icon="car" />}
+                left={() => <List.Icon icon="car" color={colors.primary} />}
               />
             );
           })}
       </ScrollView>
 
       <IconButton
-        style={{...styles.btn, bottom: filterData.length > 0 ? 50 : 0}}
+        color={colors.accent}
+        style={{...styles.btn, bottom: 0}}
         icon="plus-circle"
         size={60}
         onPress={() => handlePress(null)}

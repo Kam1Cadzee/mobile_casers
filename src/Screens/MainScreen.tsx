@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, StatusBar} from 'react-native';
 import {Button} from 'react-native-paper';
 import {MainScreenProp} from '../typings/NavigatorTypes';
 
@@ -19,18 +19,17 @@ const styles = StyleSheet.create({
 const MainScreen = ({navigation}: MainScreenProp) => {
   return (
     <View style={styles.main}>
+      <StatusBar backgroundColor={'#0277bd'} />
       <Button
-        style={styles.button}
         icon="view-list"
-        mode="contained"
+        style={styles.button}
         onPress={() => navigation.navigate('List')}>
         Транспортні засоби
       </Button>
 
       <Button
-        style={styles.button}
         icon="car"
-        mode="contained"
+        style={styles.button}
         onPress={() => navigation.navigate('Create')}>
         Новий ТЗ
       </Button>

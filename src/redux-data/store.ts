@@ -12,12 +12,6 @@ export default function configureStore() {
   const middlewares = [thunkMiddleware];
 
   const enhancers = [applyMiddleware(...middlewares)];
-  if (window) {
-    enhancers.push(
-      window.__REDUX_DEVTOOLS_EXTENSION__ &&
-        window.__REDUX_DEVTOOLS_EXTENSION__(),
-    );
-  }
 
   const store = createStore(reducers, compose(...enhancers));
   return store;
