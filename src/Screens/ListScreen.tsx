@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, View, StyleSheet, ActivityIndicator} from 'react-native';
+import {ScrollView, View, StyleSheet, RefreshControl} from 'react-native';
 import {IconButton, List, Searchbar, Title, useTheme} from 'react-native-paper';
 import {ListScreenProp} from '../typings/NavigatorTypes';
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
   con: {
     position: 'relative',
     flexGrow: 1,
+    display: 'flex',
   },
   btn: {
     position: 'absolute',
@@ -65,12 +66,15 @@ const ListScreen = ({navigation}: ListScreenProp) => {
         onChangeText={query => setSearch(query)}
         value={search}
       />
-      {isLoading ? (
-        <ActivityIndicator size="large" color={colors.accent} />
-      ) : (
-        items.length === 0 && <NoInternet />
-      )}
-      <ScrollView style={{flexGrow: 1}}>
+      {items.length === 0 && <NoInternet />}
+      <ScrollView
+        style={{flexGrow: 1}}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => dispatch(getTransportsFetch())}
+          />
+        }>
         {filterData.length > 0 &&
           filterData.map(item => {
             const desc = `Driver: ${item.driver}, Trailer: ${

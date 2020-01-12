@@ -68,18 +68,25 @@ const styles = StyleSheet.create({
 });
 const CreateScreen = ({navigation}: any) => {
   const {colors} = useTheme();
-  const id =
-    navigation.state && navigation.state.params && navigation.state.params.id;
+  const [id, setId] = useState(
+    navigation.state && navigation.state.params && navigation.state.params.id,
+  );
   const dispatch = useDispatch();
-  const [data, setData] = useState(null as ITransport | null);
-  const [devices, setDevices] = useState([] as IDevice[]);
-  const {handleSubmit, control} = useForm<ITransport>();
+  const [number_transport, setNumber_transport] = useState();
+  const [number_trailer, setNumber_trailer] = useState();
+  const [driver, setDriver] = useState();
 
-  const onSubmit = async (values: ITransport) => {
-    const obj: ITransport = {
+  const [devices, setDevices] = useState([] as IDevice[]);
+
+  const onSubmit = async () => {
+    if (!validate()) return;
+
+    const obj = {
       status: 'arrived',
       devices: devices.filter(device => device.number.trim() !== ''),
-      ...values,
+      number_transport,
+      number_trailer,
+      driver,
     };
 
     navigation.navigate('Main');
@@ -131,71 +138,72 @@ const CreateScreen = ({navigation}: any) => {
     setDevices(devices.filter((item, i) => i !== index));
   };
 
-  const onChange = (args: any) => {
-    return {
-      value: args[0].nativeEvent.text || args[0].nativeEvent.value,
-    };
+  const onBlur = async () => {
+    const res = await service.getTransportByNumber(number_transport);
+    console.log(res);
+    if (res) {
+      setData(res);
+    }
+  };
+
+  const validate = () => {
+    const device = devices.reduce(
+      (previousValue, currentValue) => previousValue + currentValue.number,
+      '',
+    );
+
+    if (
+      device === '' ||
+      number_trailer === '' ||
+      number_transport === '' ||
+      driver === ''
+    ) {
+      dispatch(changeSnackbar('Заповніть всі дані'));
+      return false;
+    }
+
+    return true;
+  };
+  const setData = (res: ITransport) => {
+    setNumber_transport(res.number_transport);
+    setNumber_trailer(res.number_trailer);
+    setDriver(res.driver);
+    setDevices(res.devices);
+    setId(res.id);
   };
 
   useEffect(() => {
     if (id) {
       service.getTransport(id).then((res: ITransport) => {
         setData(res);
-        setDevices(res.devices);
       });
-    } else {
-      setData({} as any);
     }
-  }, [id]);
+  }, []);
 
-  if (!data) {
-    return <View />;
-  }
   return (
     <View style={styles.con}>
       <ScrollView>
-        <Controller
-          as={
-            <TextInput
-              label={'Номер ТЗ'}
-              style={styles.textInput}
-              disabled={!!id}
-            />
-          }
-          control={control}
-          name="number_transport"
-          onChange={onChange}
-          rules={{required: true}}
-          defaultValue={data.number_transport}
+        <TextInput
+          label={'Номер ТЗ'}
+          style={styles.textInput}
+          disabled={!!id}
+          onBlur={onBlur}
+          onChangeText={text => setNumber_transport(text)}
+          value={number_transport}
         />
-        <Controller
-          as={
-            <TextInput
-              label={'Номер Причiпа'}
-              style={styles.textInput}
-              disabled={!!id}
-            />
-          }
-          control={control}
-          name="number_trailer"
-          onChange={onChange}
-          rules={{required: true}}
-          defaultValue={data.number_trailer}
+        <TextInput
+          label={'Номер Причiпа'}
+          style={styles.textInput}
+          disabled={!!id}
+          onChangeText={text => setNumber_trailer(text)}
+          value={number_trailer}
         />
-
-        <Controller
-          as={
-            <TextInput
-              label={'Водiй'}
-              style={styles.textInput}
-              disabled={!!id}
-            />
-          }
-          control={control}
-          name="driver"
-          onChange={onChange}
-          rules={{required: true}}
-          defaultValue={data.driver}
+        <TextInput
+          label={'Водiй'}
+          style={styles.textInput}
+          disabled={!!id}
+          onChangeText={text => setDriver(text)}
+          value={driver}
         />
         <View style={styles.devices}>
           <Title>{id ? 'Пошкодження' : 'Добавити ЗПУ'}</Title>
@@ -217,6 +225,7 @@ const CreateScreen = ({navigation}: any) => {
                     />
                     <IconButton
                       style={styles.icon}
+                      color={colors.primary}
                       icon="delete-circle"
                       size={34}
                       onPress={() => onDeleteDevice(index)}
@@ -243,7 +252,7 @@ const CreateScreen = ({navigation}: any) => {
             />
           )}
         </View>
-        <PButton mode="contained" onPress={handleSubmit(onSubmit)}>
+        <PButton mode="contained" onPress={onSubmit}>
           Вiдправити
         </PButton>
       </ScrollView>

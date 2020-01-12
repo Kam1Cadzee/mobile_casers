@@ -21,7 +21,11 @@ const initialize = (timeout: number = 8000) => {
 const getTransports = async () => {
   try {
     initialize();
-    const res = await instance.get('/transports?status=way');
+    const res = await instance.get('/transports', {
+      params: {
+        status: ['way'],
+      },
+    });
     if (res.status === 200) {
       return res.data;
     }
@@ -34,6 +38,18 @@ const getTransport = async (id: string) => {
   try {
     initialize();
     const res = await instance.get('/transports/' + id);
+    if (res.status === 200) {
+      return res.data;
+    }
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getTransportByNumber = async (number: string) => {
+  try {
+    initialize();
+    const res = await instance.get('/transports/number/' + number);
     if (res.status === 200) {
       return res.data;
     }
@@ -67,4 +83,5 @@ export default {
   addTransport,
   updateTransport,
   getTransport,
+  getTransportByNumber,
 };
