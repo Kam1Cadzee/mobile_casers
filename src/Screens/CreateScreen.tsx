@@ -7,11 +7,8 @@ import service from '../services/service';
 import {
   Button,
   TextInput,
-  Text,
   Switch,
-  Paragraph,
   IconButton,
-  Colors,
   Title,
   Subheading,
   useTheme,
@@ -20,8 +17,6 @@ import NetInfo from '@react-native-community/netinfo';
 import asyncStorage from '../services/asyncStorage';
 import {useDispatch} from 'react-redux';
 import {changeSnackbar} from '../redux-data/transport';
-
-const PButton: any = Button;
 
 const styles = StyleSheet.create({
   con: {
@@ -72,9 +67,9 @@ const CreateScreen = ({navigation}: any) => {
     navigation.state && navigation.state.params && navigation.state.params.id,
   );
   const dispatch = useDispatch();
-  const [number_transport, setNumber_transport] = useState();
-  const [number_trailer, setNumber_trailer] = useState();
-  const [driver, setDriver] = useState();
+  const [number_transport, setNumber_transport] = useState('');
+  const [number_trailer, setNumber_trailer] = useState('');
+  const [driver, setDriver] = useState('');
 
   const [devices, setDevices] = useState([] as IDevice[]);
 
@@ -139,10 +134,11 @@ const CreateScreen = ({navigation}: any) => {
   };
 
   const onBlur = async () => {
-    const res = await service.getTransportByNumber(number_transport);
-    console.log(res);
-    if (res) {
-      setData(res);
+    if (number_transport) {
+      const res = await service.getTransportByNumber(number_transport);
+      if (res) {
+        setData(res);
+      }
     }
   };
 
@@ -252,9 +248,9 @@ const CreateScreen = ({navigation}: any) => {
             />
           )}
         </View>
-        <PButton mode="contained" onPress={onSubmit}>
+        <Button mode="contained" onPress={onSubmit}>
           Вiдправити
-        </PButton>
+        </Button>
       </ScrollView>
     </View>
   );

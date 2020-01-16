@@ -21,14 +21,11 @@ const styles = StyleSheet.create({
 
 const NoInternet = () => {
   const netInfo = useNetInfo();
-  const {error} = useSelector(getTransportData);
 
   if (!netInfo.isInternetReachable) {
     return (
       <Title style={{textAlign: 'center'}}>Немає підключення до мережі</Title>
     );
-  } else if (error) {
-    return <Title style={{textAlign: 'center'}}>{error}</Title>;
   } else {
     return null;
   }
@@ -77,7 +74,7 @@ const ListScreen = ({navigation}: ListScreenProp) => {
         }>
         {filterData.length > 0 &&
           filterData.map(item => {
-            const desc = `Driver: ${item.driver}, Trailer: ${
+            const desc = `Водiй: ${item.driver}, Прицеп: ${
               item.number_trailer
             }, К-сть ЗПУ: ${item.devices.length}`;
 

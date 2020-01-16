@@ -50,11 +50,9 @@ const getTransportByNumber = async (number: string) => {
   try {
     initialize();
     const res = await instance.get('/transports/number/' + number);
-    if (res.status === 200) {
-      return res.data;
-    }
+    return res.data;
   } catch (e) {
-    throw e;
+    return '';
   }
 };
 
